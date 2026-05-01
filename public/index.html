@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grant CRM 360 AI ✨</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --bg-soft:#eef3f9;
+      --panel:#ffffff;
+      --panel-soft:#f8fbff;
+      --line:#dce4ef;
+      --line-strong:#c7d4e5;
+      --text:#172033;
+      --muted:#65728b;
+      --accent:#2f6fed;
+      --accent-soft:#eaf1ff;
+      --gold:#e5b85c;
+      --green:#1f9d62;
+      --orange:#c97a12;
+      --red:#d1485f;
+      --shadow:0 8px 28px rgba(21,35,58,.08);
+      --shadow-soft:0 3px 12px rgba(21,35,58,.05);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:linear-gradient(180deg,#f7f9fc 0,#eef3f9 100%);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    button,input,select,textarea{font:inherit}
+    .app{display:grid;grid-template-columns:280px minmax(560px,1fr) 340px;gap:18px;padding:18px;min-height:100vh;align-items:start}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .sidebar,.ai{padding:16px;position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto}
+    .main{min-width:0}
+    .brand{font-size:22px;font-weight:850;letter-spacing:-.03em}
+    .sub{color:var(--muted);font-size:12px;margin-top:4px}
+    .hero{padding:18px 20px;margin-bottom:14px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .sectionTitle{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
+    label{display:block;font-size:11px;color:var(--muted);margin:11px 0 6px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .input,select,textarea{width:100%;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:9px 11px;outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+    .input:focus,select:focus,textarea:focus{border-color:#9fbaf7;box-shadow:0 0 0 4px rgba(47,111,237,.10);background:#fff}
+    textarea{min-height:90px;resize:vertical}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .row{display:flex;gap:8px;align-items:center}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn{border:1px solid var(--line-strong);background:#fff;color:var(--text);border-radius:10px;padding:6px 10px;min-height:28px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.15;white-space:nowrap;box-shadow:var(--shadow-soft);transition:transform .12s ease,border-color .12s ease,background .12s ease}
+    .btn:hover{transform:translateY(-1px);border-color:#a9bcdd;background:#fafcff}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .btn.primary:hover{background:#245ed0}
+    .btn.ghost{background:transparent;box-shadow:none}
+    .btn.small{padding:4px 8px;min-height:24px;font-size:11px;border-radius:9px}
+    .btn.danger{background:#fff5f7;color:#8e1f32;border-color:#f2c7cf}
+    .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;color:#40506d;background:#f7faff}
+    .pill.soft{background:#fff;border-style:dashed}
+    .pill.success{background:#eefaf3;border-color:#cdebd8;color:#1d7c4d}
+    .pill.warn{background:#fff8ec;border-color:#f2dfb8;color:#9b6a10}
+    .pill.active{background:var(--accent-soft);border-color:#bfd2fb;color:#224fbd;font-weight:800}
+    .statusDot{width:8px;height:8px;border-radius:999px;background:#bcc8d8;display:inline-block}
+    .statusDot.open{background:var(--accent)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+    .stat{padding:14px 15px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-soft)}
+    .stat b{font-size:22px;display:block;line-height:1.1}
+    .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+    .panelHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+    .panelBody{padding:14px 16px}
+    .list{display:grid;gap:12px}
+    .item{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow-soft);overflow:hidden;transition:border-color .15s ease, box-shadow .15s ease}
+    .item:hover{border-color:#c9d6eb}
+    .item.active{border-color:#9bb9fb;box-shadow:0 8px 24px rgba(47,111,237,.12)}
+    .itemTop{padding:14px 16px;cursor:pointer}
+    .itemHeader{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:flex-start}
+    .itemTitle h3{margin:0 0 4px;font-size:16px;line-height:1.25}
+    .itemTitle .muted{font-size:12px}
+    .itemState{display:flex;align-items:center;gap:8px}
+    .openState{font-size:11px;font-weight:800;color:#224fbd;background:#edf3ff;border:1px solid #c7d8ff;border-radius:999px;padding:4px 8px}
+    .chev{font-size:16px;color:#5f7091;line-height:1;transition:transform .15s ease}
+    .item.active .chev{transform:rotate(180deg);color:#224fbd}
+    .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .microStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .micro{padding:8px 10px;border-radius:12px;background:var(--bg-soft);border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .micro b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
+    .score{height:8px;border-radius:999px;background:#e7edf6;overflow:hidden;margin-top:10px}
+    .score i{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--gold),var(--green));width:50%}
+    .inlineDetail{padding:0 16px 16px;border-top:1px solid var(--line);background:linear-gradient(180deg,#fcfdff,#f6f9fe)}
+    .detailShell{padding-top:14px}
+    .detailTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;margin-bottom:14px}
+    .detailName{font-size:24px;font-weight:850;letter-spacing:-.03em;line-height:1.15}
+    .summaryCards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+    .summaryCard{padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .summaryCard .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .summaryCard .v{font-size:15px;font-weight:800;margin-top:5px;line-height:1.25}
+    .callouts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .callout{border-left:4px solid var(--accent);background:#f6f9ff;padding:12px;border-radius:14px;border:1px solid #dbe6fb}
+    .sectionNav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .navChip{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;color:#3f4d69;font-size:12px;font-weight:700;cursor:pointer}
+    .navChip.active{background:var(--accent-soft);border-color:#bfd2fb;color:#224fbd}
+    .accordionList{display:grid;gap:10px}
+    .accordion{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}
+    .accordion.open{border-color:#9bb9fb;box-shadow:0 6px 18px rgba(47,111,237,.08)}
+    .accordionHead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;cursor:pointer;background:#fff}
+    .accordion.open .accordionHead{background:#f7faff}
+    .accordionInfo{display:flex;gap:12px;align-items:flex-start;min-width:0}
+    .iconBox{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#eef3fb;font-size:16px;flex:0 0 auto}
+    .accordionTitle{font-weight:800;font-size:15px;line-height:1.2}
+    .accordionDesc{font-size:12px;color:var(--muted);margin-top:2px}
+    .accordionMeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .accordionBody{display:none;padding:0 16px 16px;border-top:1px solid var(--line);background:#fcfdff}
+    .accordion.open .accordionBody{display:block}
+    .sectionBlock{padding-top:14px}
+    .kv{display:grid;grid-template-columns:160px 1fr;gap:10px;margin:10px 0}
+    .kv small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+    .note{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;white-space:pre-wrap}
+    .tableWrap{border:1px solid var(--line);border-radius:14px;overflow:auto;background:#fff}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;font-size:12px;vertical-align:top}
+    .table th{color:var(--muted);font-weight:700;background:#f8fafc;position:sticky;top:0}
+    .table tr:last-child td{border-bottom:0}
+    .empty{border:1px dashed var(--line-strong);border-radius:14px;padding:14px;color:var(--muted);text-align:center;background:#fff}
+    .splitActions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .ai{background:linear-gradient(180deg,#ffffff 0,#f8fbff 100%)}
+    .ai h2{margin:0 0 4px;font-size:20px}
+    .aiout{white-space:pre-wrap;background:#111827;color:#edf5ff;border:1px solid #24314d;border-radius:16px;padding:14px;min-height:220px;font-size:13px;line-height:1.55}
+    .helper{padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:12px}
+    .helper strong{display:block;margin-bottom:4px}
+    .footerhint{font-size:12px;color:var(--muted);margin-top:12px;padding:10px 12px;border-radius:14px;background:#fbfcfe;border:1px dashed var(--line)}
+    .modal{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;z-index:30;padding:18px}
+    .modal.open{display:flex}
+    .modalbox{width:min(820px,96vw);max-height:92vh;overflow:auto;padding:18px}
+    .formrow{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:start;margin:10px 0}
+    .toast{position:fixed;right:18px;bottom:18px;background:#13213b;color:#fff;border:1px solid #26395b;border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);display:none;z-index:40}
+    .toast.show{display:block}
+    .doclink{word-break:break-all}
+    .muted{color:var(--muted)}
+    .dangerText{color:var(--red)}
+    @media(max-width:1300px){.app{grid-template-columns:260px 1fr}.ai{grid-column:1/-1;position:relative;top:0;max-height:none}}
+    @media(max-width:920px){.app{grid-template-columns:1fr}.sidebar,.ai{position:relative;top:0;max-height:none}.stats{grid-template-columns:1fr 1fr}.summaryCards{grid-template-columns:1fr 1fr}.callouts{grid-template-columns:1fr}.grid2,.grid3,.formrow,.kv,.microStats{grid-template-columns:1fr}.detailTop{grid-template-columns:1fr}.itemHeader{grid-template-columns:1fr}.accordionHead{align-items:flex-start}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar card">
+    <div class="brand">✨ Grant CRM 360</div>
+    <div class="sub">czytelny pipeline grantowy + relacje + dokumenty + AI</div>
+
+    <label>🔍 Szukaj</label>
+    <input id="q" class="input" placeholder="fraza, kraj, funder, notatki..." />
+
+    <label>🌍 Kraj</label>
+    <select id="country"><option value="">Wszystkie</option></select>
+
+    <label>🏷️ Segment</label>
+    <select id="segment"><option value="">Wszystkie</option></select>
+
+    <div class="grid2">
+      <div>
+        <label>💰 Status grantu</label>
+        <select id="grant_status">
+          <option value="">Wszystkie</option>
+          <option>Not started</option>
+          <option>Researching</option>
+          <option>Eligibility check</option>
+          <option>Concept note</option>
+          <option>Applied</option>
+          <option>Won</option>
+          <option>Lost</option>
+        </select>
+      </div>
+      <div>
+        <label>🤝 Status relacji</label>
+        <select id="relationship_status">
+          <option value="">Wszystkie</option>
+          <option>Cold / no relationship yet</option>
+          <option>Warm intro needed</option>
+          <option>Contacted</option>
+          <option>Call booked</option>
+          <option>Relationship active</option>
+          <option>Stewardship</option>
+        </select>
+      </div>
+    </div>
+
+    <label>🎯 Minimalny fit</label>
+    <input id="min_fit" type="range" min="0" max="100" value="0" />
+    <div class="row" style="justify-content:space-between;margin-top:6px">
+      <span id="minfitv" class="pill soft">0+</span>
+      <span class="muted" style="font-size:12px">mniej szumu, więcej priorytetów</span>
+    </div>
+
+    <div class="toolbar" style="margin-top:14px">
+      <button class="btn primary" onclick="loadList()">🔄 Odśwież</button>
+      <button class="btn" onclick="clearFilters()">🧹 Wyczyść filtry</button>
+      <button class="btn" onclick="askGeneralAI()">✨ AI</button>
+    </div>
+
+    <div class="helper">
+      <strong>📦 Dane i rozszerzenia</strong>
+      <div class="toolbar">
+        <button class="btn small" onclick="exportFull()">Export JSON</button>
+        <button class="btn small" onclick="exportCSV()">Export CSV</button>
+        <button class="btn small" onclick="openImport()">Import</button>
+        <button class="btn small" onclick="showIntegrations()">Integracje</button>
+      </div>
+    </div>
+
+    <div class="footerhint">
+      💡 Kliknięcie rekordu rozwija szczegóły <b>w miejscu</b>. Otwarty rekord ma niebieską ramkę, etykietę <b>OTWARTY</b> i strzałkę skierowaną do góry.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="hero card">
+      <div>
+        <div class="brand">🏆 Grant & Relationship Pipeline</div>
+        <div class="sub">Najważniejsze rzeczy są na górze: fit, status, kolejny krok i priorytet działań.</div>
+      </div>
+      <div class="toolbar">
+        <span id="health" class="pill">⏳ start...</span>
+        <button class="btn" onclick="openAIConfig()">⚙️ AI config</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="s_total">0</b><span>rekordów po filtrach</span></div>
+      <div class="stat"><b id="s_hot">0</b><span>priorytetowe (fit 75+)</span></div>
+      <div class="stat"><b id="s_contacts">0</b><span>łącznie kontaktów</span></div>
+      <div class="stat"><b id="s_ai">AI</b><span id="s_provider">provider</span></div>
+    </div>
+
+    <section class="card">
+      <div class="panelHeader">
+        <div>
+          <div style="font-weight:800">📚 Lista organizacji</div>
+          <div class="sub">Skanuj listę szybko, a dopiero potem rozwijaj wybraną organizację.</div>
+        </div>
+        <div id="filterSummary" class="pill soft">Brak aktywnych filtrów</div>
+      </div>
+      <div class="panelBody">
+        <div id="list" class="list"></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="ai card">
+    <h2>🤖 AI Grant Partner</h2>
+    <div class="sub">Asystent ma pomagać w priorytetyzacji, przygotowaniu komunikacji i budowaniu relacji.</div>
+
+    <label>Akcja AI</label>
+    <select id="ai_action">
+      <option value="strategy">✨ Strategia</option>
+      <option value="email">✉️ Email</option>
+      <option value="relationship">🤝 Budowanie relacji</option>
+      <option value="concept">📄 Concept note</option>
+      <option value="eligibility">✅ Eligibility</option>
+      <option value="compliance">⚠️ Compliance</option>
+      <option value="next_steps">🧭 Następne kroki</option>
+      <option value="summary">🧾 Podsumuj profil</option>
+    </select>
+
+    <label>Prompt / pytanie</label>
+    <textarea id="ai_prompt" placeholder="Np. przygotuj plan rozmowy discovery, propozycję 1. maila i kolejne kroki."></textarea>
+
+    <div class="toolbar">
+      <button class="btn primary" onclick="askAI()">✨ Zapytaj AI</button>
+      <button class="btn" onclick="copyAI()">📋 Kopiuj</button>
+    </div>
+
+    <div id="ai_output" class="aiout" style="margin-top:12px">Wybierz grantodawcę i kliknij jedną z akcji AI. ✨</div>
+
+    <div class="helper">
+      <strong>🧠 Jak używać</strong>
+      Najpierw otwórz organizację, potem wybierz akcję AI. AI dostaje kontekst profilu, dokumentów, komunikacji, zadań i relacji.
+    </div>
+  </aside>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modalbox card">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2 id="modalTitle" style="margin:0">Dodaj</h2>
+      <button class="btn" onclick="closeModal()">✕ Zamknij</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div id="toast" class="toast">✅ Zapisano</div>
+
+<script>
+let rows = [];
+let selected = null;
+let detail = null;
+let activeSection = 'overview';
+let aiConfig = null;
+
+const $ = id => document.getElementById(id);
+
+async function api(url, opt) {
+  const r = await fetch(url, opt);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function init() {
+  try {
+    const h = await api('/api/health');
+    $('health').textContent = '✅ online';
+    aiConfig = h.ai;
+    $('s_provider').textContent = `${h.ai.provider} / ${h.ai.model}`;
+  } catch (e) {
+    $('health').textContent = '❌ offline';
+  }
+  await loadMeta();
+  ['q','country','segment','grant_status','relationship_status'].forEach(id => $(id).addEventListener('input', debounce(loadList, 250)));
+  $('min_fit').addEventListener('input', () => {
+    $('minfitv').textContent = $('min_fit').value + '+';
+    loadList();
+  });
+  await loadList();
+}
+
+async function loadMeta() {
+  const meta = await api('/api/meta');
+  $('country').innerHTML = '<option value="">Wszystkie</option>';
+  $('segment').innerHTML = '<option value="">Wszystkie</option>';
+  for (const c of meta.countries || []) $('country').insertAdjacentHTML('beforeend', `<option>${esc(c)}</option>`);
+  for (const s of meta.segments || []) $('segment').insertAdjacentHTML('beforeend', `<option>${esc(s)}</option>`);
+}
+
+function clearFilters() {
+  ['q','country','segment','grant_status','relationship_status'].forEach(id => setVal(id, ''));
+  $('min_fit').value = 0;
+  $('minfitv').textContent = '0+';
+  loadList();
+}
+
+async function loadList() {
+  const p = new URLSearchParams();
+  ['q','country','segment','grant_status','relationship_status','min_fit'].forEach(id => {
+    if ($(id).value) p.set(id, $(id).value);
+  });
+  rows = await api('/api/grantmakers?' + p.toString());
+  if (selected && !rows.some(r => String(r.id) === String(selected))) {
+    selected = null;
+    detail = null;
+  }
+  renderList();
+}
+
+function renderList() {
+  $('s_total').textContent = rows.length;
+  $('s_hot').textContent = rows.filter(r => (r.funding_fit_score || 0) >= 75).length;
+  $('s_contacts').textContent = rows.reduce((a, r) => a + (r.contacts_count || 0), 0);
+  $('filterSummary').textContent = activeFilterSummary();
+
+  $('list').innerHTML = rows.map(r => {
+    const isOpen = selected === r.id && detail;
+    return `
+      <div class="item ${isOpen ? 'active' : ''}">
+        <div class="itemTop" onclick="selectOne('${r.id}')">
+          <div class="itemHeader">
+            <div class="itemTitle">
+              <h3>🏛️ ${esc(r.name)}</h3>
+              <div class="muted">${esc(r.country || 'Brak kraju')} • ${esc(r.segment || 'Brak segmentu')}</div>
+            </div>
+            <div class="itemState">
+              ${isOpen ? '<span class="openState">OTWARTY</span>' : ''}
+              <button class="btn small ${isOpen ? '' : 'primary'}" onclick="event.stopPropagation();selectOne('${r.id}')">${isOpen ? '📂 Profil otwarty' : '🔎 Otwórz profil'}</button>
+              <span class="chev">⌄</span>
+            </div>
+          </div>
+
+          <div class="meta">
+            <span class="pill active">🎯 Fit ${r.funding_fit_score || 50}</span>
+            <span class="pill">💰 ${esc(r.grant_status || 'Not started')}</span>
+            <span class="pill">🤝 ${esc(r.relationship_status || 'Cold')}</span>
+            ${r.next_action ? `<span class="pill soft">🧭 ${esc(shortText(r.next_action, 44))}</span>` : ''}
+          </div>
+
+          <div class="microStats">
+            <div class="micro"><b>${r.contacts_count || 0}</b>Kontaktów</div>
+            <div class="micro"><b>${r.documents_count || 0}</b>Dokumentów</div>
+            <div class="micro"><b>${r.open_tasks_count || 0}</b>Otwarte zadania</div>
+          </div>
+
+          <div class="score"><i style="width:${r.funding_fit_score || 50}%"></i></div>
+        </div>
+
+        ${isOpen ? `<div class="inlineDetail" onclick="event.stopPropagation()">${detailMarkup()}</div>` : ''}
+      </div>
+    `;
+  }).join('') || '<div class="empty">Brak wyników dla bieżących filtrów.</div>';
+
+  if (detail) hydrateProfileFields();
+}
+
+async function selectOne(id) {
+  if (selected === id && detail) {
+    selected = null;
+    detail = null;
+    renderList();
+    return;
+  }
+  selected = id;
+  activeSection = 'overview';
+  detail = await api('/api/grantmakers/' + id);
+  renderList();
+}
+
+function activeFilterSummary() {
+  const parts = [];
+  if (val('q')) parts.push(`fraza: ${val('q')}`);
+  if (val('country')) parts.push(`kraj: ${val('country')}`);
+  if (val('segment')) parts.push(`segment: ${val('segment')}`);
+  if (val('grant_status')) parts.push(`grant: ${val('grant_status')}`);
+  if (val('relationship_status')) parts.push(`relacja: ${val('relationship_status')}`);
+  if (Number(val('min_fit') || 0) > 0) parts.push(`fit ${val('min_fit')}+`);
+  return parts.length ? parts.join(' • ') : 'Brak aktywnych filtrów';
+}
+
+function detailMarkup() {
+  const contacts = detail.contacts || [];
+  const docs = detail.documents || [];
+  const tasks = detail.tasks || [];
+  const openTasks = tasks.filter(t => !/done|completed|closed/i.test(String(t.status || ''))).length;
+  const opps = detail.opportunities || [];
+  const interactions = detail.interactions || [];
+  const assets = detail.assets || [];
+
+  return `
+    <div class="detailShell">
+      <div class="detailTop">
+        <div>
+          <div class="detailName">🏛️ ${esc(detail.name)}</div>
+          <div class="sub">${esc(detail.country || 'Brak kraju')} • ${esc(detail.segment || 'Brak segmentu')} • ${esc(detail.funder_type || 'Grantmaker')}</div>
+        </div>
+        <div class="toolbar">
+          <button class="btn primary" onclick="saveProfile()">💾 Zapisz profil</button>
+          <button class="btn" onclick="quickAI('strategy')">✨ Strategia</button>
+          <button class="btn" onclick="quickAI('email')">✉️ Email</button>
+        </div>
+      </div>
+
+      <div class="summaryCards">
+        <div class="summaryCard"><div class="k">🎯 Fit</div><div class="v">${esc(detail.funding_fit_score ?? detail.fit ?? '—')}</div></div>
+        <div class="summaryCard"><div class="k">💰 Status grantu</div><div class="v">${esc(detail.grant_status || 'Not started')}</div></div>
+        <div class="summaryCard"><div class="k">🤝 Relacja</div><div class="v">${esc(detail.relationship_status || 'Cold / no relationship yet')}</div></div>
+        <div class="summaryCard"><div class="k">🧭 Następny krok</div><div class="v">${esc(shortText(detail.next_action || detail.next_best_action || 'Brak', 60))}</div></div>
+      </div>
+
+      <div class="callouts">
+        <div class="callout"><b>✨ AI next best action</b><br>${esc(detail.next_best_action || 'Zweryfikuj eligibility i przygotuj 1-stronicowy concept note.')}</div>
+        <div class="callout"><b>🤝 Cel relacji</b><br>${esc(detail.relationship_goal || 'Przejść od cold prospect do rozmowy eligibility.')}</div>
+      </div>
+
+      <div class="sectionNav">
+        ${navChip('overview','🌐 Przegląd')}
+        ${navChip('profile','📝 Profil i pipeline')}
+        ${navChip('contacts','👥 Kontakty')}
+        ${navChip('opps','🏁 Szanse grantowe')}
+        ${navChip('docs','📄 Dokumenty')}
+        ${navChip('comm','✉️ Komunikacja')}
+        ${navChip('tasks','✅ Zadania')}
+        ${navChip('relationship','🤝 Relacja')}
+        ${navChip('ai','🤖 AI i historia')}
+      </div>
+
+      <div class="accordionList">
+        ${accordion('overview','🌐','Przegląd','najważniejsze informacje na start','', overviewSection())}
+        ${accordion('profile','📝','Profil i pipeline','ustaw priorytet, statusy i notatki','', profileSection())}
+        ${accordion('contacts','👥','Kontakty',`${contacts.length} rekordów`,`${contacts.length}`, contactsSection())}
+        ${accordion('opps','🏁','Szanse grantowe',`${opps.length} rekordów`,`${opps.length}`, opportunitiesSection())}
+        ${accordion('docs','📄','Dokumenty',`${docs.length} rekordów`,`${docs.length}`, documentsSection())}
+        ${accordion('comm','✉️','Komunikacja',`${interactions.length} wpisów`,`${interactions.length}`, communicationSection())}
+        ${accordion('tasks','✅','Zadania',`${openTasks} otwarte`,`${tasks.length}`, tasksSection())}
+        ${accordion('relationship','🤝','Relacja i stewardship',`${assets.length} aktywów`,`${assets.length}`, relationshipSection())}
+        ${accordion('ai','🤖','AI i historia','działania AI dla tego profilu','', aiSection())}
+      </div>
+    </div>
+  `;
+}
+
+function navChip(key, label) {
+  return `<button class="navChip ${activeSection === key ? 'active' : ''}" onclick="setSection('${key}')">${label}</button>`;
+}
+
+function accordion(key, icon, title, desc, count, body) {
+  const open = activeSection === key;
+  return `
+    <section class="accordion ${open ? 'open' : ''}">
+      <div class="accordionHead" onclick="setSection('${key}')">
+        <div class="accordionInfo">
+          <div class="iconBox">${icon}</div>
+          <div>
+            <div class="accordionTitle">${title}</div>
+            <div class="accordionDesc">${esc(desc || '')}</div>
+          </div>
+        </div>
+        <div class="accordionMeta">
+          ${count ? `<span class="pill soft">${esc(count)}</span>` : ''}
+          ${open ? '<span class="pill active"><span class="statusDot open"></span> Otwarte</span>' : '<span class="pill soft"><span class="statusDot"></span> Zamknięte</span>'}
+          <span class="chev">⌄</span>
+        </div>
+      </div>
+      <div class="accordionBody"><div class="sectionBlock">${body}</div></div>
+    </section>
+  `;
+}
+
+function setSection(key) {
+  activeSection = key;
+  renderDetail();
+}
+
+function renderDetail() {
+  if (!detail) return;
+  renderList();
+  const target = document.querySelector('.accordion.open');
+  if (target) target.scrollIntoView({ block: 'nearest' });
+}
+
+function overviewSection() {
+  return `
+    <div class="kv"><small>Fit / zgodność</small><div>${esc(detail.fit || detail.funding_fit_explanation || 'Brak opisu fit.')}</div></div>
+    <div class="kv"><small>Eligibility</small><div>${esc(detail.eligibility || 'Brak oceny eligibility.')}</div></div>
+    <div class="kv"><small>Grant route</small><div>${link(detail.grant_route)} ${detail.apply_url ? `<br><a target="_blank" href="${esc(detail.apply_url)}">🔗 Apply URL</a>` : ''}</div></div>
+    <div class="kv"><small>Kontakt publiczny</small><div>${link(detail.public_contact || '') || '<span class="muted">Brak</span>'}</div></div>
+    <div class="kv"><small>Źródło</small><div>${link(detail.source_url || '') || '<span class="muted">Brak</span>'}</div></div>
+    <div class="splitActions">
+      <div class="muted">Najpierw oceń dopasowanie, potem kliknij AI i przygotuj wiadomość.</div>
+      <div class="toolbar">
+        <button class="btn small" onclick="quickAI('strategy')">✨ Strategia</button>
+        <button class="btn small" onclick="quickAI('relationship')">🤝 Plan relacji</button>
+        <button class="btn small" onclick="quickAI('eligibility')">✅ Eligibility</button>
+      </div>
+    </div>
+  `;
+}
+
+function profileSection() {
+  return `
+    <div class="grid3">
+      <div>
+        <label>💰 Status grantu</label>
+        <select id="p_grant_status">
+          <option>Not started</option><option>Researching</option><option>Eligibility check</option><option>Concept note</option><option>Applied</option><option>Won</option><option>Lost</option>
+        </select>
+      </div>
+      <div>
+        <label>🤝 Status relacji</label>
+        <select id="p_relationship_status">
+          <option>Cold / no relationship yet</option><option>Warm intro needed</option><option>Contacted</option><option>Call booked</option><option>Relationship active</option><option>Stewardship</option>
+        </select>
+      </div>
+      <div>
+        <label>⭐ Priorytet 1-5</label>
+        <input id="p_priority" class="input" type="number" min="1" max="5" />
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div><label>🎯 Fit score</label><input id="p_funding_fit_score" class="input" type="number" min="0" max="100" /></div>
+      <div><label>🤝 Relationship score</label><input id="p_relationship_strength_score" class="input" type="number" min="0" max="100" /></div>
+      <div><label>🔥 Urgency score</label><input id="p_urgency_score" class="input" type="number" min="0" max="100" /></div>
+    </div>
+
+    <label>🧭 Następne działanie</label>
+    <input id="p_next_action" class="input" />
+    <label>📅 Data następnego działania</label>
+    <input id="p_next_action_date" class="input" type="date" />
+
+    <div class="grid2">
+      <div>
+        <label>📝 Notatki grantowe</label>
+        <textarea id="p_grant_notes"></textarea>
+      </div>
+      <div>
+        <label>🌱 Notatki relacyjne</label>
+        <textarea id="p_relationship_notes"></textarea>
+      </div>
+    </div>
+
+    <label>🏷️ Tagi</label>
+    <input id="p_custom_tags" class="input" placeholder="np. women, youth, digital wellbeing" />
+
+    <div class="grid2">
+      <div>
+        <label>🤝 Warm intro source</label>
+        <textarea id="p_warm_intro_source"></textarea>
+      </div>
+      <div>
+        <label>🗺️ Stakeholder map</label>
+        <textarea id="p_stakeholder_map"></textarea>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <label>💡 Value offer</label>
+        <textarea id="p_value_offer"></textarea>
+      </div>
+      <div>
+        <label>🎁 Stewardship plan</label>
+        <textarea id="p_stewardship_plan"></textarea>
+      </div>
+    </div>
+
+    <label>⚠️ Risks and objections</label>
+    <textarea id="p_risks_and_objections"></textarea>
+  `;
+}
+
+function contactsSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">Buduj mapę kontaktów i zapisuj preferowane kanały komunikacji.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('contact')">➕ Dodaj kontakt</button>
+        <button class="btn" onclick="quickAI('email')">✉️ Email AI</button>
+      </div>
+    </div>
+    ${table(detail.contacts, ['full_name','role_title','email','phone','preferred_channel','notes'])}
+  `;
+}
+
+function opportunitiesSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">Tutaj trzymaj konkretne ścieżki grantowe, deadline’y i strategię wygrania.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('opportunity')">➕ Dodaj szansę</button>
+        <button class="btn" onclick="quickAI('eligibility')">✅ Eligibility AI</button>
+      </div>
+    </div>
+    ${table(detail.opportunities, ['opportunity_name','stage','status','deadline_date','application_url','success_strategy'])}
+  `;
+}
+
+function documentsSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">Dokumenty powinny być spójne z komunikacją i planem relacji.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('document')">📎 Dodaj / upload dokument</button>
+        <button class="btn" onclick="quickAI('concept')">📄 Concept note AI</button>
+      </div>
+    </div>
+    ${table(detail.documents, ['title','doc_type','status','owner','file_or_url','notes'])}
+  `;
+}
+
+function communicationSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">Loguj wszystkie kanały: email, SMS, telefon, WhatsApp, Telegram, Twilio.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('interaction')">➕ Zaloguj kontakt</button>
+        <button class="btn" onclick="openForm('outbound')">📤 Wyślij / loguj outbound</button>
+        <button class="btn" onclick="openForm('inbound')">📥 Zaloguj inbound</button>
+        <button class="btn" onclick="openForm('calendar')">🗓️ Wydarzenie</button>
+      </div>
+    </div>
+    ${table(detail.interactions, ['interaction_date','channel','person_or_role','subject','outcome','next_action'])}
+  `;
+}
+
+function tasksSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">Zadania utrzymują porządek: co, do kiedy, przez kogo.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('task')">➕ Dodaj zadanie</button>
+        <button class="btn" onclick="quickAI('next_steps')">🧭 Następne kroki AI</button>
+      </div>
+    </div>
+    ${table(detail.tasks, ['title','status','due_date','owner','notes'])}
+  `;
+}
+
+function relationshipSection() {
+  return `
+    <div class="splitActions">
+      <div class="muted">W tym miejscu trzymaj działania relacyjne i stewardship po kontakcie lub po grancie.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="openForm('asset')">➕ Dodaj asset relacyjny</button>
+        <button class="btn" onclick="quickAI('relationship')">🤝 AI relacja</button>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="note"><b>Warm intro source</b>\n${esc(detail.warm_intro_source || 'Brak')}</div>
+      <div class="note"><b>Stewardship plan</b>\n${esc(detail.stewardship_plan || 'Brak')}</div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="note"><b>Stakeholder map</b>\n${esc(detail.stakeholder_map || 'Brak')}</div>
+      <div class="note"><b>Value offer</b>\n${esc(detail.value_offer || 'Brak')}</div>
+    </div>
+    <div class="note" style="margin-bottom:12px"><b>Risks and objections</b>\n${esc(detail.risks_and_objections || 'Brak')}</div>
+    ${table(detail.assets, ['asset_type','title','status','send_after_date','notes'])}
+  `;
+}
+
+function aiSection() {
+  const history = detail.ai_history || [];
+  return `
+    <div class="splitActions">
+      <div class="muted">AI może pracować na całym kontekście tej organizacji.</div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="quickAI('strategy')">✨ Strategia</button>
+        <button class="btn" onclick="quickAI('summary')">🧾 Podsumuj</button>
+        <button class="btn" onclick="openAIConfig()">⚙️ Konfiguracja</button>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="note"><b>AI provider</b>\n${esc(aiConfig?.provider || 'N/A')}</div>
+      <div class="note"><b>AI model</b>\n${esc(aiConfig?.model || 'N/A')}</div>
+    </div>
+    <h3 style="margin:0 0 10px">🕰️ Historia AI</h3>
+    ${history.length ? history.map(a => `<div class="note" style="margin-bottom:10px"><b>${esc(a.action)} • ${esc(a.provider)} • ${esc(a.model)}</b>\n${esc(a.response || '')}</div>`).join('') : '<div class="empty">Brak historii AI dla tego profilu.</div>'}
+  `;
+}
+
+function hydrateProfileFields() {
+  const fields = ['grant_status','relationship_status','priority','funding_fit_score','relationship_strength_score','urgency_score','next_action','next_action_date','grant_notes','relationship_notes','custom_tags','warm_intro_source','stakeholder_map','value_offer','stewardship_plan','risks_and_objections'];
+  fields.forEach(f => setVal('p_' + f, f.includes('date') ? dateOnly(detail[f]) : detail[f]));
+}
+
+async function saveProfile() {
+  if (!selected) return;
+  const ids = [...document.querySelectorAll('[id^="p_"]')].map(x => x.id.slice(2));
+  const body = {};
+  ids.forEach(k => {
+    const el = $('p_' + k);
+    if (!el) return;
+    body[k] = el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
+  });
+  await api('/api/grantmakers/' + selected + '/profile', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  toast('✅ Profil zapisany');
+  detail = await api('/api/grantmakers/' + selected);
+  renderDetail();
+}
+
+function openForm(type) {
+  const title = {
+    contact:'👥 Dodaj kontakt',
+    interaction:'✉️ Zaloguj komunikację',
+    task:'✅ Dodaj zadanie',
+    opportunity:'🏁 Dodaj szansę grantową',
+    document:'📄 Dodaj dokument',
+    asset:'🤝 Dodaj asset relacyjny',
+    outbound:'📤 Outbound message',
+    inbound:'📥 Inbound message',
+    calendar:'🗓️ Wydarzenie kalendarza'
+  }[type];
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = formHtml(type);
+  $('modal').classList.add('open');
+}
+
+function closeModal() {
+  $('modal').classList.remove('open');
+  $('modalBody').innerHTML = '';
+}
+
+function formHtml(type) {
+  if (type === 'outbound') return `<form onsubmit="submitForm(event,'outbound')"><div class="formrow"><label>Kanał</label><input name="channel" class="input" value="email"></div><div class="formrow"><label>Provider</label><input name="provider" class="input" placeholder="google / microsoft / twilio / whatsapp / telegram"></div><div class="formrow"><label>Do</label><input name="to_address" class="input"></div><div class="formrow"><label>Temat</label><input name="subject" class="input"></div><div class="formrow"><label>Treść</label><textarea name="body"></textarea></div><div class="formrow"><label>Status</label><input name="status" class="input" value="Draft"></div><button class="btn primary">💾 Zapisz draft / log</button></form>`;
+  if (type === 'inbound') return `<form onsubmit="submitForm(event,'inbound')"><div class="formrow"><label>Kanał</label><input name="channel" class="input" value="email"></div><div class="formrow"><label>Provider</label><input name="provider" class="input" placeholder="google / microsoft / twilio / whatsapp / telegram"></div><div class="formrow"><label>Od</label><input name="from_address" class="input"></div><div class="formrow"><label>Temat</label><input name="subject" class="input"></div><div class="formrow"><label>Treść / notatka</label><textarea name="body"></textarea></div><button class="btn primary">💾 Zaloguj odpowiedź</button></form>`;
+  if (type === 'calendar') return `<form onsubmit="submitForm(event,'calendar')"><div class="formrow"><label>Tytuł</label><input name="title" class="input" required value="Grant follow-up"></div><div class="formrow"><label>Provider</label><input name="provider" class="input" placeholder="google / microsoft"></div><div class="formrow"><label>Start</label><input name="starts_at" class="input" type="datetime-local"></div><div class="formrow"><label>Koniec</label><input name="ends_at" class="input" type="datetime-local"></div><div class="formrow"><label>Lokalizacja</label><input name="location" class="input"></div><div class="formrow"><label>Opis</label><textarea name="description"></textarea></div><button class="btn primary">💾 Zapisz wydarzenie</button></form>`;
+  if (type === 'document') return `<form onsubmit="submitForm(event,'document')"><div class="formrow"><label>Tytuł</label><input name="title" class="input" required></div><div class="formrow"><label>Typ</label><input name="doc_type" class="input" value="Concept note"></div><div class="formrow"><label>Status</label><input name="status" class="input" value="Draft"></div><div class="formrow"><label>Plik</label><input name="file" class="input" type="file"></div><div class="formrow"><label>Notatki</label><textarea name="notes"></textarea></div><button class="btn primary">💾 Zapisz dokument</button></form>`;
+  const common = {
+    contact:[['full_name','Imię / nazwa'],['role_title','Rola'],['email','Email'],['phone','Telefon'],['contact_url','URL kontaktu'],['notes','Notatki']],
+    interaction:[['channel','Kanał'],['person_or_role','Osoba / rola'],['subject','Temat'],['outcome','Wynik'],['next_action','Następny krok'],['next_action_date','Data następnego kroku']],
+    task:[['title','Tytuł'],['status','Status'],['due_date','Termin'],['owner','Owner'],['notes','Notatki']],
+    opportunity:[['opportunity_name','Nazwa'],['stage','Etap'],['status','Status'],['deadline_date','Deadline'],['application_url','URL aplikacji'],['success_strategy','Strategia']],
+    asset:[['asset_type','Typ'],['title','Tytuł'],['status','Status'],['send_after_date','Wysłać po'],['notes','Notatki']]
+  }[type];
+  return `<form onsubmit="submitForm(event,'${type}')">${common.map(([n,l]) => `<div class="formrow"><label>${l}</label>${n.includes('notes') || n.includes('strategy') || n === 'outcome' ? `<textarea name="${n}"></textarea>` : `<input name="${n}" class="input" ${n.includes('date') ? 'type="date"' : ''} ${n === 'title' || n === 'opportunity_name' ? 'required' : ''}>`}</div>`).join('')}<button class="btn primary">💾 Zapisz</button></form>`;
+}
+
+async function submitForm(ev, type) {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  const map = {contact:'contacts',interaction:'interactions',task:'tasks',opportunity:'opportunities',document:'documents',asset:'assets',outbound:'outbound-messages',inbound:'inbound-messages',calendar:'calendar-events'};
+  const url = '/api/grantmakers/' + selected + '/' + map[type];
+  let opt;
+  if (type === 'document') {
+    opt = { method:'POST', body:fd };
+  } else {
+    opt = { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(fd.entries())) };
+  }
+  await api(url, opt);
+  closeModal();
+  toast('✅ Dodano');
+  detail = await api('/api/grantmakers/' + selected);
+  renderDetail();
+}
+
+async function quickAI(action) {
+  $('ai_action').value = action;
+  await askAI();
+  if (selected) {
+    detail = await api('/api/grantmakers/' + selected);
+    activeSection = 'ai';
+    renderDetail();
+  }
+}
+
+async function askGeneralAI() {
+  selected = null;
+  detail = null;
+  $('ai_prompt').value = 'Pomóż mi wybrać 5 najlepszych kolejnych działań w pipeline grantowym i relacyjnym.';
+  await askAI();
+  renderList();
+}
+
+async function askAI() {
+  $('ai_output').textContent = '⏳ AI myśli...';
+  const out = await api('/api/ai/assist', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({grantmaker_id:selected, action:$('ai_action').value, prompt:$('ai_prompt').value})
+  });
+  $('ai_output').textContent = out.text;
+}
+
+async function openAIConfig() {
+  const c = await api('/api/ai/config');
+  $('ai_output').textContent = '⚙️ AI config\n\nAktualnie: ' + JSON.stringify(c.current, null, 2) + '\n\nModele / providerzy:\n' + JSON.stringify(c.models, null, 2) + '\n\nSkopiuj .env.example do .env i ustaw AI_PROVIDER oraz klucz API.';
+}
+
+function exportFull() { window.open('/api/export/full.json', '_blank'); }
+function exportCSV() { window.open('/api/export/grantmakers.csv', '_blank'); }
+
+function openImport() {
+  $('modalTitle').textContent = '⬆️ Import grantodawców';
+  $('modalBody').innerHTML = `<form onsubmit="submitImport(event)"><div class="formrow"><label>Format</label><select name="format" class="input"><option value="json">JSON</option><option value="csv">CSV</option></select></div><div class="formrow"><label>Plik</label><input name="file" class="input" type="file" required></div><div class="note">Import aktualizuje lub dodaje rekordy fundacji / grantodawców. Po imporcie zweryfikuj źródła i compliance przed kontaktem.</div><br><button class="btn primary">⬆️ Importuj</button></form>`;
+  $('modal').classList.add('open');
+}
+
+async function submitImport(ev) {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  const out = await api('/api/import/grantmakers', { method:'POST', body:fd });
+  closeModal();
+  toast(`✅ Import: ${out.rows_success || 0} OK, ${out.rows_failed || 0} błędów`);
+  await loadMeta();
+  await loadList();
+}
+
+async function showIntegrations() {
+  const c = await api('/api/integrations/catalog');
+  $('ai_output').textContent = '🔌 Integracje komunikacji i kalendarzy\n\n' + JSON.stringify(c, null, 2) + '\n\nStatus: paczka zawiera schema, konfigurację, import/logowanie i endpointy. Żywe wysyłanie przez OAuth / Twilio / WhatsApp / Telegram wymaga wpisania sekretów w .env i włączenia ENABLE_LIVE_SEND po testach.';
+}
+
+function copyAI() {
+  navigator.clipboard.writeText($('ai_output').textContent || '');
+  toast('📋 Skopiowano');
+}
+
+function table(arr, cols) {
+  if (!arr || !arr.length) return '<div class="empty">Brak rekordów. Użyj przycisku ➕, żeby dodać.</div>';
+  return `<div class="tableWrap"><table class="table"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${arr.map(r => `<tr>${cols.map(c => `<td>${link(r[c] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+function link(v) {
+  v = String(v || '');
+  if (!v) return '';
+  if (v.includes('@')) return v.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig, m => `<a href="mailto:${m}">${m}</a>`);
+  if (/^\/storage\//.test(v)) return `<a class="doclink" target="_blank" href="${esc(v)}">📎 ${esc(v)}</a>`;
+  if (/^https?:\/\//.test(v)) return `<a target="_blank" href="${esc(v)}">${esc(v)}</a>`;
+  return esc(v);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function val(id) { return $(id)?.value || ''; }
+function setVal(id, v) { if ($(id)) $(id).value = v ?? ''; }
+function dateOnly(v) { return v ? String(v).slice(0,10) : ''; }
+function shortText(v, n) { v = String(v || ''); return v.length > n ? v.slice(0, n - 1) + '…' : v; }
+function debounce(fn, ms) { let t; return () => { clearTimeout(t); t = setTimeout(fn, ms); }; }
+function toast(t) { $('toast').textContent = t; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 1800); }
+
+init().catch(e => {
+  console.error(e);
+  $('health').textContent = '❌ ' + e.message;
+});
+</script>
+</body>
+</html>
