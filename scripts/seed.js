@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 const { pool } = require('../server/db');
 
 const playbook = [
@@ -21,10 +22,10 @@ async function main(){
   await pool.query('BEGIN');
   try {
     for (const r of rows) {
-      await pool.query(`INSERT INTO grantmakers (id,segment,name,country,region,fit,eligibility,grant_route,public_contact,apply_url,source_url,ai_strategy,contact_type,privacy_note,last_checked)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
-        ON CONFLICT (id) DO UPDATE SET segment=EXCLUDED.segment,name=EXCLUDED.name,country=EXCLUDED.country,region=EXCLUDED.region,fit=EXCLUDED.fit,eligibility=EXCLUDED.eligibility,grant_route=EXCLUDED.grant_route,public_contact=EXCLUDED.public_contact,apply_url=EXCLUDED.apply_url,source_url=EXCLUDED.source_url,ai_strategy=EXCLUDED.ai_strategy,contact_type=EXCLUDED.contact_type,privacy_note=EXCLUDED.privacy_note,last_checked=EXCLUDED.last_checked,updated_at=now()`,
-        [r.id,r.segment,r.name,r.country,r.region,r.fit,r.eligibility,r.grant_route,r.public_contact,r.apply_url,r.source_url,r.ai_strategy,r.contact_type,r.privacy_note,r.last_checked]);
+      await pool.query(`INSERT INTO grantmakers (id,segment,name,country,region,fit,eligibility,grant_route,public_contact,apply_url,source_url,ai_strategy,contact_type,privacy_note,last_checked,how_to_apply,repayability_type)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        ON CONFLICT (id) DO UPDATE SET segment=EXCLUDED.segment,name=EXCLUDED.name,country=EXCLUDED.country,region=EXCLUDED.region,fit=EXCLUDED.fit,eligibility=EXCLUDED.eligibility,grant_route=EXCLUDED.grant_route,public_contact=EXCLUDED.public_contact,apply_url=EXCLUDED.apply_url,source_url=EXCLUDED.source_url,ai_strategy=EXCLUDED.ai_strategy,contact_type=EXCLUDED.contact_type,privacy_note=EXCLUDED.privacy_note,last_checked=EXCLUDED.last_checked,how_to_apply=EXCLUDED.how_to_apply,repayability_type=EXCLUDED.repayability_type,updated_at=now()`,
+        [r.id,r.segment,r.name,r.country,r.region,r.fit,r.eligibility,r.grant_route,r.public_contact,r.apply_url,r.source_url,r.ai_strategy,r.contact_type,r.privacy_note,r.last_checked,r.how_to_apply||null,r.repayability_type||null]);
       const sc=fitScore(r), cur=currency(r.country);
       await pool.query(`INSERT INTO crm_profiles (grantmaker_id,organization_summary,program_fit_notes,mission_alignment_notes,funding_fit_score,relationship_strength_score,urgency_score,currency,budget_status,relationship_goal,value_offer,next_best_action,ai_recommended_message,stewardship_plan)
         VALUES ($1,$2,$3,$4,$5,0,50,$6,'Not started',$7,$8,$9,$10,$11)
@@ -45,6 +46,8 @@ async function main(){
     for(const [stage,advice,example] of playbook){
       await pool.query(`INSERT INTO relationship_playbook_items (stage,advice,example_action) SELECT $1,$2,$3 WHERE NOT EXISTS (SELECT 1 FROM relationship_playbook_items WHERE stage=$1 AND advice=$2)`,[stage,advice,example]);
     }
+    const adminHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'GrantCRM2026!', 12);
+    await pool.query(`INSERT INTO users (username,password_hash) VALUES ('admin',$1) ON CONFLICT (username) DO NOTHING`, [adminHash]);
     await pool.query('COMMIT');
     console.log(`Seed complete: ${rows.length} grantmakers loaded.`);
   } catch(e){ await pool.query('ROLLBACK'); throw e; }

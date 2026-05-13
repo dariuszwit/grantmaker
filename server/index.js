@@ -8,8 +8,10 @@ const morgan = require('morgan');
 const multer = require('multer');
 const { pool } = require('./db');
 const { callAI, providerConfig, modelsCatalog } = require('./ai');
+const { sessionMiddleware, requireAuth, loginHandler, logoutHandler, meHandler } = require('./auth');
 
 const app = express();
+app.set('trust proxy', 1);
 const port = process.env.PORT || 8080;
 const storageRoot = path.join(__dirname, '..', 'storage', 'documents');
 fs.mkdirSync(storageRoot, { recursive: true });
@@ -34,6 +36,14 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json({ limit: '12mb' }));
 app.use(morgan('dev'));
+app.use(sessionMiddleware());
+
+app.get('/api/health', async (req,res,next)=>{ try{ const r=await pool.query('SELECT now() as now'); res.json({ok:true, db_time:r.rows[0].now, ai: providerConfig()}); }catch(e){next(e);} });
+app.get('/login', (req,res)=>{ if(req.session?.userId) return res.redirect('/'); res.sendFile(path.join(__dirname,'..','public','login.html')); });
+app.post('/api/auth/login', loginHandler);
+app.get('/api/auth/me', meHandler);
+app.post('/api/auth/logout', logoutHandler);
+app.use(requireAuth);
 app.use('/storage/documents', express.static(storageRoot));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -41,7 +51,6 @@ const emptyToNull = v => v === '' || v === undefined ? null : v;
 const like = v => `%${String(v || '').toLowerCase()}%`;
 const profileFields = ['grant_status','relationship_status','priority','owner','contact_person_or_role','contacted_with','last_contact_date','next_action','next_action_date','grant_notes','relationship_notes','custom_tags','organization_summary','mission_alignment_notes','program_fit_notes','eligibility_risk_notes','funding_fit_score','relationship_strength_score','urgency_score','estimated_ask_amount','currency','deadline_date','decision_cycle','budget_status','warm_intro_source','stakeholder_map','decision_maker_notes','relationship_goal','value_offer','stewardship_plan','risks_and_objections','evidence_assets','next_best_action','ai_recommended_message','last_research_date'];
 
-app.get('/api/health', async (req,res,next)=>{ try{ const r=await pool.query('SELECT now() as now'); res.json({ok:true, db_time:r.rows[0].now, ai: providerConfig()}); }catch(e){next(e);} });
 app.get('/api/ai/config', (req,res)=>res.json({ current: providerConfig(), models: modelsCatalog(), env_example: ['AI_PROVIDER=openai','OPENAI_API_KEY=sk-...','OPENAI_MODEL=gpt-5.5','AI_TEMPERATURE=0.3','AI_MAX_TOKENS=1400'] }));
 
 app.get('/api/grantmakers', async (req,res,next)=>{ try{
@@ -194,10 +203,10 @@ app.post('/api/import/grantmakers', importUpload.single('file'), async (req,res,
   for (const r of rows) {
     try {
       const id = String(r.id || r.name || `imported-${Date.now()}-${ok}`).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,120);
-      await pool.query(`INSERT INTO grantmakers (id,segment,name,country,region,fit,eligibility,grant_route,public_contact,apply_url,source_url,ai_strategy,contact_type,privacy_note,last_checked)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
-        ON CONFLICT (id) DO UPDATE SET segment=EXCLUDED.segment,name=EXCLUDED.name,country=EXCLUDED.country,region=EXCLUDED.region,fit=EXCLUDED.fit,eligibility=EXCLUDED.eligibility,grant_route=EXCLUDED.grant_route,public_contact=EXCLUDED.public_contact,apply_url=EXCLUDED.apply_url,source_url=EXCLUDED.source_url,ai_strategy=EXCLUDED.ai_strategy,contact_type=EXCLUDED.contact_type,privacy_note=EXCLUDED.privacy_note,last_checked=EXCLUDED.last_checked,updated_at=now()`,
-        [id,r.segment,r.name || id,r.country,r.region,r.fit,r.eligibility,r.grant_route,r.public_contact,r.apply_url,r.source_url,r.ai_strategy,r.contact_type || 'Institutional / public',r.privacy_note || 'Imported; verify source and compliance before outreach.',emptyToNull(r.last_checked)]);
+      await pool.query(`INSERT INTO grantmakers (id,segment,name,country,region,fit,eligibility,grant_route,public_contact,apply_url,source_url,ai_strategy,contact_type,privacy_note,last_checked,how_to_apply,repayability_type)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        ON CONFLICT (id) DO UPDATE SET segment=EXCLUDED.segment,name=EXCLUDED.name,country=EXCLUDED.country,region=EXCLUDED.region,fit=EXCLUDED.fit,eligibility=EXCLUDED.eligibility,grant_route=EXCLUDED.grant_route,public_contact=EXCLUDED.public_contact,apply_url=EXCLUDED.apply_url,source_url=EXCLUDED.source_url,ai_strategy=EXCLUDED.ai_strategy,contact_type=EXCLUDED.contact_type,privacy_note=EXCLUDED.privacy_note,last_checked=EXCLUDED.last_checked,how_to_apply=EXCLUDED.how_to_apply,repayability_type=EXCLUDED.repayability_type,updated_at=now()`,
+        [id,r.segment,r.name || id,r.country,r.region,r.fit,r.eligibility,r.grant_route,r.public_contact,r.apply_url,r.source_url,r.ai_strategy,r.contact_type || 'Institutional / public',r.privacy_note || 'Imported; verify source and compliance before outreach.',emptyToNull(r.last_checked),r.how_to_apply||null,r.repayability_type||null]);
       await pool.query('INSERT INTO crm_profiles (grantmaker_id) VALUES ($1) ON CONFLICT (grantmaker_id) DO NOTHING',[id]);
       ok++;
     } catch(err) { console.error('Import row failed', err); fail++; }
@@ -260,6 +269,62 @@ app.post('/api/grantmakers/:id/calendar-events', async (req,res,next)=>{ try{
   res.status(201).json(r.rows[0]);
 }catch(e){next(e);} });
 
+
+// ---------- Server-side URL research (fetch + AI extract) ----------
+app.post('/api/research-url', async (req, res, next) => { try {
+  const { url, grantmaker_id } = req.body || {};
+  if (!url) return res.status(400).json({ error: 'url required' });
+
+  // Fetch the URL
+  let pageText = '';
+  try {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 12000);
+    const r = await fetch(url, { signal: controller.signal, headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GrantCRM/1.0)' } });
+    const html = await r.text();
+    // Strip HTML tags, normalize whitespace
+    pageText = html
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim()
+      .slice(0, 6000);
+  } catch (fetchErr) {
+    return res.status(422).json({ error: `Cannot fetch URL: ${fetchErr.message}` });
+  }
+
+  const { callAI } = require('./ai');
+  const extractPrompt = `Analyze the following web page content from a grant-making organization and extract the following as JSON:
+{
+  "name": "full program/organization name",
+  "segment": "type of funder",
+  "country": "country",
+  "region": "region or global",
+  "fit": "fit description for a digital wellness/mental health app",
+  "eligibility": "who can apply",
+  "grant_route": "how to apply, brief",
+  "how_to_apply": "step-by-step numbered application process",
+  "repayability_type": "one of: bezzwrotny grant / pożyczka zwrotna / inwestycja kapitałowa / mieszany",
+  "typical_amount": "typical grant amount",
+  "apply_url": "direct application URL if found",
+  "public_contact": "public contact email or phone"
+}
+Return ONLY valid JSON, no other text.
+
+Web page URL: ${url}
+Content:
+${pageText}`;
+
+  const aiResult = await callAI({ action: 'research', prompt: extractPrompt, grantmaker: null });
+  let extracted = {};
+  try {
+    const jsonMatch = aiResult.text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) extracted = JSON.parse(jsonMatch[0]);
+  } catch (e) { extracted = { raw: aiResult.text }; }
+
+  res.json({ url, extracted, ai_provider: aiResult.provider });
+} catch(e) { next(e); } });
 
 app.use((err,req,res,next)=>{ console.error(err); res.status(500).json({error:err.message||'Server error'}); });
 app.listen(port,'0.0.0.0',()=>console.log(`🚀 Grant CRM Premium AI 360 running on http://localhost:${port}`));

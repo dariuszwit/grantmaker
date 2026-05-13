@@ -3,7 +3,7 @@ setlocal
 chcp 65001 >nul
 cd /d "%~dp0"
 echo ============================================
-echo  ✨ Grant CRM Premium AI - start lokalny
+echo   Grant CRM Premium AI - start lokalny
 echo ============================================
 
 if not exist "run.py" (
@@ -35,6 +35,8 @@ if errorlevel 1 (
 )
 
 echo [OK] Uruchamiam aplikacje w tle...
+echo [INFO] Sprawdzam stary kontener PostgreSQL...
+docker rm -f grantcrm_postgres >nul 2>nul
 py .\run.py --detach
 
 echo.
