@@ -6,6 +6,28 @@
 
 ## Zrobione
 
+### 2. Usunięcie domeny services.linis.it — zrobione 2026-10-21
+
+Polecenie: „services.linis.it. usuń tę domenę".
+
+- **DNS (OVH, linis.it):** usunięte tylko rekordy A `services` (id 5409294852) i A `www.services`
+  (id 5443320478), oba → 20.215.66.208; innych rekordów (`_acme-challenge`, `*.services`) nie było.
+  Strefa odświeżona. `nslookup -type=A services.linis.it ns107.ovh.net` i to samo dla `www.` →
+  Non-existent domain. Rekordy `grantscrm`, `www.grantscrm`, `meetio` nietknięte.
+- **nginx na vm-fastovh:** usunięte `/etc/nginx/sites-enabled/services-linis.conf` (link) i
+  `/etc/nginx/sites-available/services-linis.conf`; `nginx -t` OK, reload OK; w `/etc/nginx` brak
+  odwołań do services.linis.it.
+- **Certyfikat LE:** `certbot delete --cert-name services.linis.it`; zostały certy `fastovh.com`,
+  `grantscrm.linis.it`, `meetio.linis.it`.
+- **Kopia przed usunięciem (na VM):** `/root/services-linis-it-removed-20261020222639.tgz` (vhost,
+  link, renewal conf, live + archive certu; chmod 600).
+- **Bez zmian:** kontener docker `linis_services_api` (127.0.0.1:5100) dalej działa (Up 33 h),
+  VM nie była restartowana. Usunięcie kontenera i `/home/azureuser/linis-services` to osobna
+  decyzja właściciela.
+- **Sprawdzone na żywo:** https://grantscrm.linis.it → 302 /login (także `www`),
+  https://meetio.linis.it 200, https://fastovh.com 200.
+- `deploy/add_dns_and_ssl.py` obsługuje tylko `grantscrm`, nie odtworzy rekordów services — bez zmian.
+
 ### 1. Naprawa adresów grantscrm.linis.it i services.linis.it — zrobione 2026-10-20
 
 Polecenie: „napraw te adresy: grantscrm.linis.it i services.linis.it".
