@@ -19,7 +19,7 @@ CK = os.environ.get("OVH_CONSUMER_KEY", "")
 ENDPOINT = "https://eu.api.ovh.com/1.0"
 DOMAIN = "linis.it"
 SUBDOMAIN = "grantscrm"
-VM_IP = "74.248.33.90"
+VM_IP = "20.215.66.208"
 
 
 def ovh_req(method, path, body=None):
