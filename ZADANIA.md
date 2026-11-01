@@ -2,7 +2,9 @@
 
 ## Do zrobienia
 
-(brak)
+### 3. Wyrównanie projektu na LenGem (zlecone 2026-11-01 w `D:\dev\general`)
+
+Git przez `git bundle` (LenGem nie ma poświadczeń GitHub), poza gitem nic (projekt bez plików ignorowanych).
 
 ## Zrobione
 
