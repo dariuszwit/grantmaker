@@ -2,11 +2,13 @@
 
 ## Do zrobienia
 
-### 3. Wyrównanie projektu na LenGem (zlecone 2026-11-01 w `D:\dev\general`)
-
-Git przez `git bundle` (LenGem nie ma poświadczeń GitHub), poza gitem nic (projekt bez plików ignorowanych).
+(brak)
 
 ## Zrobione
+
+### 3. Wyrównanie projektu na LenGem — zrobione 2026-11-02 (zlecone 2026-11-01 w `D:\dev\general`)
+
+Git przez `git bundle` (LenGem nie ma poświadczeń GitHub): `D:\dev\grantmaker` na LenGem na `main` 253e472, origin ustawiony na GitHub. Poza gitem nic (projekt bez plików ignorowanych), pamięci Claude dla projektu brak na obu komputerach.
 
 ### 2. Usunięcie domeny services.linis.it — zrobione 2026-10-21
 
